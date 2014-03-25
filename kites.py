@@ -13,7 +13,7 @@ if sys.argv[1:]:
     port = int(sys.argv[1])
 else:
     port = 8000
-server_address = ('127.0.0.1', port)
+server_address = ('localhost', port)
 
 HandlerClass.protocol_version = Protocol
 httpd = ServerClass(server_address, HandlerClass)
