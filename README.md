@@ -1,4 +1,4 @@
 Kites
 =====
 
-Kite server 
+Kite server -- a very simple apk autoupadte server 

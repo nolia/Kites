@@ -1,23 +1,50 @@
 #!/usr/bin/python
 
 import sys
+import time
+import logging
 import BaseHTTPServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
+from watchdog.observers import Observer
+from watchdog.events import LoggingEventHandler
 
+def watchFiles():
+  logging.basicConfig(level=logging.INFO,
+                        format='%(asctime)s - %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S')
 
-HandlerClass = SimpleHTTPRequestHandler
-ServerClass  = BaseHTTPServer.HTTPServer
-Protocol     = "HTTP/1.0"
+  path =  sys.argv[1] if len(sys.argv) > 1 else '.'
+  event_handler = LoggingEventHandler()
+  observer = Observer()
+  observer.schedule(event_handler, path, recursive=True)
+  observer.start()
+  try:
+      while True:
+          time.sleep(1)
+  except KeyboardInterrupt:
+      observer.stop()
+  observer.join()
+#end
 
-if sys.argv[1:]:
-    port = int(sys.argv[1])
-else:
-    port = 8000
-server_address = ('localhost', port)
+def startServeFiles():
 
-HandlerClass.protocol_version = Protocol
-httpd = ServerClass(server_address, HandlerClass)
+  HandlerClass = SimpleHTTPRequestHandler
+  ServerClass  = BaseHTTPServer.HTTPServer
+  Protocol     = "HTTP/1.0"
 
-sa = httpd.socket.getsockname()
-print "Serving HTTP on", sa[0], "port", sa[1], "..."
-httpd.serve_forever()
+  if sys.argv[1:]:
+      port = int(sys.argv[1])
+  else:
+      port = 9000
+  server_address = ('localhost', port)
+
+  HandlerClass.protocol_version = Protocol
+  httpd = ServerClass(server_address, HandlerClass)
+
+  sa = httpd.socket.getsockname()
+  print "Serving HTTP on", sa[0], "port", sa[1], "..."
+  httpd.serve_forever()
+#end
+
+if __name__ == "__main__":
+  watchFiles()
